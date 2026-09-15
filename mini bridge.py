@@ -1,5 +1,6 @@
 import streamlit as st
 from groq import Groq
+import re
 
 st.title("🧠 MindBridge")
 st.write("Connecting Questions to Understanding")
@@ -38,12 +39,13 @@ concrete, never abstract or vague.
 Adapt the framing of questions to the subject provided (engineering, math, 
 physics, chemistry, economics, computer science, etc.) — the concept of 
 "assumptions" looks different in each field, so make the question specific 
-to that field's reasoning style.
+to that field's reasoning style."""
 
-Formatting rule: for any mathematical formula or equation, always wrap it in 
-single dollar signs for inline math like $x = y + z$, or double dollar signs 
-on their own line for bigger equations like $$x = y + z$$. Never use square 
-bracket notation like [ ... ] or \\( \\) \\[ \\] for math."""
+def fix_math(text):
+    text = re.sub(r"\\\[(.*?)\\\]", r"$$\1$$", text, flags=re.DOTALL)
+    text = re.sub(r"\\\((.*?)\\\)", r"$\1$", text, flags=re.DOTALL)
+    text = text.replace("\\boxed", "")
+    return text
 
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -51,7 +53,7 @@ if "messages" not in st.session_state:
 for msg in st.session_state.messages:
     if msg["role"] != "system":
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            st.markdown(fix_math(msg["content"]))
 
 user_input = st.chat_input("Type your problem or answer here...")
 
@@ -67,6 +69,6 @@ if user_input:
                 messages=st.session_state.messages,
             )
             reply = response.choices[0].message.content
-            st.markdown(reply)
+            st.markdown(fix_math(reply))
 
     st.session_state.messages.append({"role": "assistant", "content": reply})
