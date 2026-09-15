@@ -38,36 +38,35 @@ concrete, never abstract or vague.
 Adapt the framing of questions to the subject provided (engineering, math, 
 physics, chemistry, economics, computer science, etc.) — the concept of 
 "assumptions" looks different in each field, so make the question specific 
-to that field's reasoning style."""
+to that field's reasoning style.
 
-# --- Set up memory (runs only once per session) ---
+Formatting rule: for any mathematical formula or equation, always wrap it in 
+single dollar signs for inline math like $x = y + z$, or double dollar signs 
+on their own line for bigger equations like $$x = y + z$$. Never use square 
+bracket notation like [ ... ] or \\( \\) \\[ \\] for math."""
+
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
-# --- Show all previous messages on the page ---
 for msg in st.session_state.messages:
     if msg["role"] != "system":
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-# --- Chat input box at the bottom ---
 user_input = st.chat_input("Type your problem or answer here...")
 
 if user_input:
-    # Save and show the user's message
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    # Get and show the assistant's reply
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             response = client.chat.completions.create(
-                model="openai/gpt-oss-120b",
+                model="openai/gpt-oss-20b",
                 messages=st.session_state.messages,
             )
             reply = response.choices[0].message.content
             st.markdown(reply)
 
-    # Save the assistant's reply to memory
     st.session_state.messages.append({"role": "assistant", "content": reply})
