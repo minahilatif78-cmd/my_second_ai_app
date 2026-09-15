@@ -63,7 +63,7 @@ if user_input:
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             response = client.chat.completions.create(
-                model="openai/gpt-oss-20b",
+                model="openai/gpt-oss-120b",
                 messages=st.session_state.messages,
             )
             reply = response.choices[0].message.content
